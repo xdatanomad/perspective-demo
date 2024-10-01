@@ -53,7 +53,7 @@ def generate_varying_amplitude_wave(
 
     # attenuate the wave period by period by a random amplitude
     for period in period_indices:
-        print(f"period: {period}")
+        # print(f"period: {period}")
         start, mid, end = period
         wave[start:mid] *= np.random.randint(1, abs(max_amp))
         wave[mid:end] *= np.random.randint(1, abs(max_amp))
