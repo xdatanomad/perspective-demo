@@ -32,36 +32,42 @@ STOCKS_SCHEMA = {
     'portfolio_value': 'float'
 }
 
+
 # Load the stock data from a CSV file
 def load_stock_data(csv_path):
-    df = pd.read_csv(csv_path, parse_dates=['date'])
-    df = df.sort_values(by='date').reset_index(drop=True)
+    df = pd.read_csv(csv_path, header=0)
+    # df = df.sort_values(by='date').reset_index(drop=True)
     return df
 
 
-# # TODO: change to use a List[ts] series instead of df argument
-
 # Define a CSP node that simulates a stock data stream by outputting rows as dictionaries
 @csp.node
-def stock_data_stream(data: pd.DataFrame, interval: timedelta = timedelta(seconds=1)) -> ts[dict]:
+def stock_data_stream(data: List[dict], interval: timedelta = timedelta(seconds=1)) -> ts[List[dict]]:
     with csp.alarms():
         a_tick = csp.alarm(bool)
 
     with csp.state():
-        s_data = data.to_dict(orient='records')  # Convert the DataFrame to a list of dictionaries (hashable)
+        s_data = data.copy()
         s_index = 0  # to track the current index in the stream
 
     with csp.start():
         csp.schedule_alarm(a_tick, timedelta(), True)
 
     if csp.ticked(a_tick):
-        # Output one row of stock data at a time as a dictionary
-        if s_index < len(s_data):
-            current_day_data = s_data[s_index]
-            csp.output([current_day_data])  # Output as a list of one dict to match Perspective's format
-            # TODO: loop back to the beginning
-            s_index += 1
+        # Output one row of stock data one day at the time
+        if s_index >= len(s_data):
+            s_index = 0
+        # find the slice data just for today's date
+        current_date = s_data[s_index]['date']
+        last_index = s_index
+        while (last_index < len(s_data)) and (current_date == s_data[last_index]['date']):
+            last_index += 1
+        # slice today's records: from s_index to next_index
+        csp.output(s_data[s_index:last_index])
+        # shift forward to the next day index
+        s_index = last_index
         csp.schedule_alarm(a_tick, interval, True)
+
 
 # Method to push data to Perspective widget
 @csp.node
