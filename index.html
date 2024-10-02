@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <script type="module" src="/static/perspective.js"></script>
+    <script type="module" src="/static/perspective-viewer.js"></script>
+    <script type="module" src="/static/perspective-viewer-datagrid.js"></script>
+    <script type="module" src="/static/perspective-viewer-d3fc.js"></script>
+  </head>
+
+
+  <body>
+    <perspective-viewer id="machines"></perspective-viewer>
+  </body>
+
+
+  <script type="module">
+    import perspective from "/static/perspective.js";
+
+    window.addEventListener("DOMContentLoaded", async function () {
+        const websocket = await perspective.websocket("ws://localhost:8080/websocket");
+        const worker = perspective.worker();
+        ["machines"].forEach(async (table) => {
+          document.getElementById(table).load(websocket.open_table(table));
+        });
+    });
+</script>
+</html>
