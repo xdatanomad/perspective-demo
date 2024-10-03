@@ -163,3 +163,5 @@ cython_debug/
 
 # custom files
 data/sample_social_media.csv
+data/historical_stock_prices.zip
+data/historical_stock_prices.csv
