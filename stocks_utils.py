@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from perspective.widget import PerspectiveWidget
-from perspective import table as PerspectiveTable
 import threading
 import time
 
