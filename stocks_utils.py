@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from perspective.widget import PerspectiveWidget
 import threading
 import time
+from typing import Union, List
 
 
 __all__ = (
@@ -52,7 +53,7 @@ class DemoDataStreamPlayer:
     A class to stock's date file and 
     """
 
-    def __init__(self, data_filepath: str, widget: PerspectiveWidget, interval: int = 0.1, **kwargs):
+    def __init__(self, data_filepath: str, widgets: Union[PerspectiveWidget, List[PerspectiveWidget]], interval: int = 0.1, **kwargs):
         """
         Initializes the RepeatedTimer instance.
 
@@ -63,7 +64,10 @@ class DemoDataStreamPlayer:
         - kwargs: Keyword arguments to pass to the function.
         """
         self.data_filepath = data_filepath
-        self.widget: PerspectiveWidget = widget
+        if isinstance(widgets, list):
+            self.widgets: List[PerspectiveWidget] = widgets
+        else:
+            self.widgets: List[PerspectiveWidget] = [widgets]
         self.interval = interval
         self.kwargs = kwargs
         self.thread = None
@@ -117,7 +121,8 @@ class DemoDataStreamPlayer:
                 self.current_frame_date = datetime.strftime(
                     datetime.strptime(self.current_frame_date, r'%Y-%m-%d') + timedelta(days=1), 
                     r'%Y-%m-%d')
-                self.widget.update(data)
+                for widget in self.widgets:
+                    widget.update(data.copy())
             except Exception as e:
                 print(f"Error occurred: {e}")
             # Sleep until the next execution time
