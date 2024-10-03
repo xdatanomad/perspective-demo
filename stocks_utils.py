@@ -9,7 +9,6 @@ import time
 __all__ = (
     "STOCKS_SCHEMA",
     "DemoDataStreamPlayer",
-
 )
 
 STOCKS_SCHEMA = {
