@@ -8,6 +8,7 @@ import time
 
 __all__ = (
     "STOCKS_SCHEMA",
+    "TRADES_SCHEMA",
     "DemoDataStreamPlayer",
 )
 
@@ -27,6 +28,22 @@ STOCKS_SCHEMA = {
     'trade_value': 'float', 
     'cash_reserves': 'float', 
     'portfolio_value': 'float'
+}
+
+TRADES_SCHEMA = {
+    'trade_id': 'integer', 
+    'trade_timestamp': 'datetime', 
+    'ticker': 'string', 
+    'broker': 'string', 
+    'bid_price': 'float', 
+    'ask_price': 'float', 
+    'trade_price': 'float', 
+    'bid_spread': 'float', 
+    'shares': 'integer', 
+    'trade_value': 'float', 
+    'open': 'float', 
+    'close': 'float', 
+    'date': 'date'
 }
 
 
@@ -67,7 +84,7 @@ class DemoDataStreamPlayer:
         for col in {'date', 'ticker'}:
             assert col in df.columns, f"'{col}' column not present!"
         # drop columns
-        df.drop(columns=['year'], inplace=True)
+        df.drop(columns=['year'], inplace=True, errors='ignore')
         # converting down column data types to float and unsigned ints
         for col in df.columns:
             cast_down_type = None
